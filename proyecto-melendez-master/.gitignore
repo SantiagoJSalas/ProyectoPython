@@ -3,3 +3,4 @@ server/lib64
 server/include
 server/bin
 __pycache__
+server/myenv    
