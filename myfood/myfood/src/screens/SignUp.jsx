@@ -1,6 +1,8 @@
-import { Box, Button, FormControl, FormLabel, Input, VStack } from "@chakra-ui/react";
+import { Box, Button, FormControl, FormLabel, Input, VStack, Text } from "@chakra-ui/react";
+import { useNavigate } from "react-router-dom";
 
-function SignUp() {
+const SignUp = () => {
+  const navigate = useNavigate();
   return (
     <Box width="400px" p={4} m="20px auto">
       <VStack spacing={4}>
@@ -27,6 +29,16 @@ function SignUp() {
         <Button colorScheme="teal" type="submit">
           Sign Up
         </Button>
+        <Text>
+          Ya tienes una cuenta? 
+          <Button 
+            colorScheme="teal" 
+            variant="link" 
+            onClick={() => navigate('/')}
+          >
+            Inicia Sesion
+          </Button>
+        </Text>
       </VStack>
     </Box>
   );
