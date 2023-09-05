@@ -7,11 +7,10 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route exact path="/" component={Login} />
-        <Route path="/main" component={Main} />
+        <Route path="/" element={<Login />} />
+        <Route path="/main" element={<Main />} />
       </Routes>
     </Router>
-
   );
 }
 
