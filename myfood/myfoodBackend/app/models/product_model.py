@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 
 class Product(BaseModel):
-    id: int
-    family_id: int
+    id: str
+    family_id: str
     name: str
     quantity: int

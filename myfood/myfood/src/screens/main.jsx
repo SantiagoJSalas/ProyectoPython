@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Box, Grid, Flex, Heading, Text, Button, Input, useDisclosure, Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter, ModalBody, ModalCloseButton } from "@chakra-ui/react";
 import Sidebar from "../components/SideBar";
+import formatURL from "../utilities/apiFormat";
+import axios from 'axios';
 
 const Main = () => {
     const [families, setFamilies] = useState([
@@ -13,25 +15,56 @@ const Main = () => {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [newProductName, setNewProductName] = useState('');
     const [newProductQuantity, setNewProductQuantity] = useState('');
+    useEffect(() => {
+        // Obtener las familias del servidor al cargar el componente
+        const fetchFamilies = async () => {
+            try {
+                const response = await axios.get(formatURL('families/'));
+                console.log(response.data);
+                setFamilies(response.data);
+            } catch (error) {
+                console.error("Error fetching families:", error);
+            }
+        };
 
-    const handleDeleteProduct = (productId) => {
-        setProducts(prevProducts => prevProducts.filter(product => product.id !== productId));
+        fetchFamilies();
+    }, []);
+    const handleDeleteProduct = async (productId) => {
+        try {
+            await axios.delete(formatURL(`products/${productId}`));
+            setProducts(prevProducts => prevProducts.filter(product => product.id !== productId));
+        } catch (error) {
+            console.error(`Error deleting product ${productId}:`, error);
+        }
     };
-    const handleAddProduct = () => {
+    const handleAddProduct = async () => {
         if (newProductName.trim() && newProductQuantity) {
-            const newProduct = { id: Date.now(), name: newProductName, quantity: newProductQuantity };
-            setProducts(prevProducts => [...prevProducts, newProduct]);
-            setNewProductName('');
-            setNewProductQuantity('');
-            onClose();
+            try {
+                const productData = {
+                    name: newProductName,
+                    quantity: newProductQuantity,
+                    familyId: selectedFamily.id // Suponiendo que necesites el ID de la familia al crear un producto
+                };
+                const response = await axios.post(formatURL('products/'), productData);
+                const newProduct = response.data;
+                setProducts(prevProducts => [...prevProducts, newProduct]);
+                setNewProductName('');
+                setNewProductQuantity('');
+                onClose();
+            } catch (error) {
+                console.error("Error adding product:", error);
+            }
         }
     };
 
-    const getProductsForFamily = (familyId) => {
-        if (familyId === 1) {
-            return [{ id: 1, name: 'Arroz', quantity: 5 }, { id: 2, name: 'Leche', quantity: 3 }];
-        }   
-        return [];
+    const getProductsForFamily = async (familyId) => {
+        try {
+            const response = await axios.get(formatURL(`families/${familyId}/products`));
+            return response.data;
+        } catch (error) {
+            console.error(`Error fetching products for family ${familyId}:`, error);
+            return [];
+        }
     }
 
     const handleFamilySelect = (family) => {

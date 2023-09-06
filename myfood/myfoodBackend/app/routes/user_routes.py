@@ -8,7 +8,7 @@ router = APIRouter()
 
 @router.post("/", response_model=User)
 async def create_user(user: User):
-    user_dict = user.dict()
+    user_dict = dict(user)
     result = db.users.insert_one(user_dict)
     user_dict["id"] = str(result.inserted_id)
     return user_dict
@@ -32,7 +32,7 @@ async def get_user(user_id: str):
 
 @router.put("/{user_id}", response_model=User)
 async def update_user(user_id: str, user: User):
-    user_dict = user.dict()
+    user_dict = dict(user)
     result = db.users.replace_one({"_id": ObjectId(user_id)}, user_dict)
     if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="User not found")

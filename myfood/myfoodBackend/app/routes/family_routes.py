@@ -1,37 +1,37 @@
 from fastapi import APIRouter, HTTPException
-from typing import List
 from models.family_model import Family
-from connection.connectionDB import db
+import controllers.family_controller as family_controller
 
 router = APIRouter()
 
 @router.post("/", response_model=Family)
-def create_family(family: Family):
-    db.insert_one(family.dict())
-    return family
+async def create_family_endpoint(family: Family):
+    family_data = dict(family)
+    created_family = await family_controller.create_family(family_data)
+    return created_family
 
-@router.get("/", response_model=List[Family])
-def read_families():
-    return list(db.find())
+@router.get("/", response_model=list[Family])
+async def get_all_families():
+    return await family_controller.get_all_families()
 
 @router.get("/{family_id}", response_model=Family)
-def read_family(family_id: int):
-    family = db.find_one({"id": family_id})
+async def get_family_by_id(family_id: int):
+    family = await family_controller.get_family_by_id(family_id)
     if not family:
         raise HTTPException(status_code=404, detail="Family not found")
     return family
 
 @router.put("/{family_id}", response_model=Family)
-def update_family(family_id: int, family: Family):
-    result = db.update_one({"id": family_id}, {"$set": family.dict()})
-    if result.matched_count == 0:
-        raise HTTPException(status_code=404, detail="Family not found")
-    return db.find_one({"id": family_id})
-
-@router.delete("/{family_id}", response_model=Family)
-def delete_family(family_id: int):
-    family = db.find_one({"id": family_id})
+async def update_family_endpoint(family_id: int, family_update: Family):
+    updated_data = dict(family_update)
+    family = await family_controller.update_family(family_id, updated_data)
     if not family:
         raise HTTPException(status_code=404, detail="Family not found")
-    db.delete_one({"id": family_id})
     return family
+
+@router.delete("/{family_id}")
+async def delete_family_endpoint(family_id: int):
+    deleted_family = await family_controller.delete_family(family_id)
+    if not deleted_family:
+        raise HTTPException(status_code=404, detail="Family not found")
+    return {"status": "success", "message": "Family deleted"}

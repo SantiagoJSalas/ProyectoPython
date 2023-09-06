@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
 class Family(BaseModel):
-    id: int
+    id: str
     name: str
-    user_id: int
+    user_id: str
