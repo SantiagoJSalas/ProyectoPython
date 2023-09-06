@@ -8,7 +8,7 @@ app = FastAPI()
 
 # Configuración del middleware CORS
 origins = [
-    "http://localhost:8080",  # Cambia esto a la URL de tu aplicación Vue.js
+    "http://localhost:3000",  # Cambia esto a la URL de tu aplicación Vue.js
 ]
 
 app.add_middleware(

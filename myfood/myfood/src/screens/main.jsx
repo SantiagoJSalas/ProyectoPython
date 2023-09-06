@@ -19,9 +19,16 @@ const Main = () => {
         // Obtener las familias del servidor al cargar el componente
         const fetchFamilies = async () => {
             try {
-                const response = await axios.get(formatURL('families/'));
+                const response = await axios.get("http://localhost:8000/families/");
                 console.log(response.data);
-                setFamilies(response.data);
+                const transformedData = response.data.map(item => {
+                    return {
+                        id: item.id,
+                        name: item.name
+                    }
+                });
+                console.log(transformedData);
+                setFamilies(transformedData);
             } catch (error) {
                 console.error("Error fetching families:", error);
             }
@@ -41,12 +48,15 @@ const Main = () => {
         if (newProductName.trim() && newProductQuantity) {
             try {
                 const productData = {
+                    id: "1",
                     name: newProductName,
-                    quantity: newProductQuantity,
-                    familyId: selectedFamily.id // Suponiendo que necesites el ID de la familia al crear un producto
+                    quantity: parseInt(newProductQuantity, 10), // Convert to integer
+                    family_id: selectedFamily.id // Change "familyId" to "family_id"
                 };
+    
                 const response = await axios.post(formatURL('products/'), productData);
                 const newProduct = response.data;
+    
                 setProducts(prevProducts => [...prevProducts, newProduct]);
                 setNewProductName('');
                 setNewProductQuantity('');
@@ -56,10 +66,11 @@ const Main = () => {
             }
         }
     };
+    
 
     const getProductsForFamily = async (familyId) => {
         try {
-            const response = await axios.get(formatURL(`families/${familyId}/products`));
+            const response = await axios.get(formatURL(`products/families/${familyId}/products`));
             return response.data;
         } catch (error) {
             console.error(`Error fetching products for family ${familyId}:`, error);
@@ -67,11 +78,12 @@ const Main = () => {
         }
     }
 
-    const handleFamilySelect = (family) => {
+    const handleFamilySelect = async (family) => {
         setSelectedFamily(family);
-        const familyProducts = getProductsForFamily(family.id);
+        const familyProducts = await getProductsForFamily(family.id); // agrega 'await' aquí
         setProducts(familyProducts);
     }
+    
 
     const handleIncreaseQuantity = (productId) => {
         setProducts(prevProducts =>

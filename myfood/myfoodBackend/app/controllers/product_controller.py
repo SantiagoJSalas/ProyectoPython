@@ -32,3 +32,9 @@ async def update_product(product_id: str, product_data: dict) -> Optional[dict]:
 async def delete_product(product_id: str) -> bool:
     result = db.products.delete_one({"_id": ObjectId(product_id)})
     return result.deleted_count > 0
+async def get_products_by_family(family_id: str) -> List[dict]:
+    products = list(db.products.find({"family_id": family_id}) ) # ajusta el parámetro `length` según tus necesidades
+    for product in products:
+        product["id"] = str(product["_id"])
+        del product["_id"]
+    return products

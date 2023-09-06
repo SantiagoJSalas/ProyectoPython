@@ -45,7 +45,7 @@ const SignIn = () => {
           <Input type="password" placeholder="Password" />
         </FormControl>
 
-        <Button colorScheme="blue" type="submit" >
+        <Button colorScheme="blue" type="submit" onClick={() => navigate('/main')}>
           Sign In
         </Button>
 

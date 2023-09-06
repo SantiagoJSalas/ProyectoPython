@@ -36,3 +36,9 @@ async def delete_product_endpoint(product_id: str):
     if not success:
         raise HTTPException(status_code=404, detail="Product not found")
     return {"status": "success", "message": "Product deleted"}
+@router.get("/families/{family_id}/products", response_model=List[Product])
+async def get_products_by_family(family_id: str):
+    products = await product_controller.get_products_by_family(family_id)
+    if not products:
+        raise HTTPException(status_code=404, detail="No products found for the given family")
+    return products
